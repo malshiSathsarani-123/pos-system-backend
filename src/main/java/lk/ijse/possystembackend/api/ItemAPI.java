@@ -8,10 +8,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lk.ijse.possystembackend.bo.custom.CustomerBO;
-import lk.ijse.possystembackend.bo.custom.impl.CustomerBOImpl;
+import lk.ijse.possystembackend.bo.custom.ItemBO;
+import lk.ijse.possystembackend.bo.custom.impl.ItemBOImpl;
 import lk.ijse.possystembackend.dao.custom.impl.CustomerDAOImpl;
-import lk.ijse.possystembackend.dto.CustomerDTO;
+import lk.ijse.possystembackend.dto.ItemDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,13 +23,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-@WebServlet(name ="customer",urlPatterns = "/customer")
+@WebServlet(name ="item",urlPatterns = "/item")
 
-public class CustomerAPI extends HttpServlet {
+public class ItemAPI extends HttpServlet {
 
     Connection connection;
 
-    CustomerBO customerBO = new CustomerBOImpl();
+    ItemBO itemBO = new ItemBOImpl();
 
     Logger logger = LoggerFactory.getLogger(CustomerDAOImpl.class);
 
@@ -40,7 +40,6 @@ public class CustomerAPI extends HttpServlet {
             InitialContext ctx = new InitialContext();
             DataSource pool = (DataSource) ctx.lookup("java:comp/env/jdbc/posSystem");
             this.connection = pool.getConnection();
-
         } catch (NamingException | SQLException e) {
             e.printStackTrace();
         }
@@ -52,8 +51,8 @@ public class CustomerAPI extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         } else {
             Jsonb jsonb = JsonbBuilder.create();
-            CustomerDTO customerDTO = jsonb.fromJson(req.getReader(), CustomerDTO.class);
-            customerBO.saveCustomer(customerDTO, connection);
+            ItemDTO itemDTO = jsonb.fromJson(req.getReader(), ItemDTO.class);
+            itemBO.saveItem(itemDTO, connection);
         }
     }
 
@@ -63,8 +62,8 @@ public class CustomerAPI extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         } else {
             Jsonb jsonb = JsonbBuilder.create();
-            CustomerDTO customerDTO = jsonb.fromJson(req.getReader(), CustomerDTO.class);
-            customerBO.updateCustomer(customerDTO, connection);
+            ItemDTO itemDTO = jsonb.fromJson(req.getReader(), ItemDTO.class);
+            itemBO.updateItem(itemDTO, connection);
         }
     }
 
@@ -74,18 +73,18 @@ public class CustomerAPI extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         } else {
             Jsonb jsonb = JsonbBuilder.create();
-            CustomerDTO customerDTO = jsonb.fromJson(req.getReader(), CustomerDTO.class);
-            customerBO.deleteCustomer(customerDTO.getId(), connection);
+            ItemDTO itemDTO = jsonb.fromJson(req.getReader(), ItemDTO.class);
+            itemBO.deleteItem(itemDTO.getCode(), connection);
         }
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ArrayList<ItemDTO> allItem = itemBO.getAllItem(connection);
 
-        ArrayList<CustomerDTO> allCustomer = customerBO.getAllCustomer(connection);
         try {
             Jsonb jsonb = JsonbBuilder.create();
-            var json = jsonb.toJson(allCustomer);
+            var json = jsonb.toJson(allItem);
             resp.setContentType("application/json");
             resp.getWriter().write(json);
         } catch (IOException e) {

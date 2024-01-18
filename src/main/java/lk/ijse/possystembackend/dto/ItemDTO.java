@@ -9,10 +9,9 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerDTO implements Serializable {
-    private String id;
-    private String name;
-    private String address;
-    private String email;
-    private Integer contact;
+public class ItemDTO implements Serializable {
+    private String code;
+    private String description;
+    private Integer qty;
+    private Double unitPrice;
 }
